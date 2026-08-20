@@ -1,0 +1,33 @@
+namespace: guardrails-ms
+
+deployment:
+  name: externaldb-guardrail
+  replicas: 1
+  labels:
+    appName: externaldb-guardrail
+
+  container:
+    name: postgres
+    image:
+      name: bitnamilegacy/postgresql
+      version: 17.6.0-debian-12-r4
+      imagePullPolicy: IfNotPresent
+    port: 5432
+    env:
+        postgres_user: myuser
+        postgres_password: mysecretpassword
+        name_of_db: guardrail_db
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 200m
+      limits:
+        memory: 2Gi
+        cpu: 1
+
+service:
+  name: postgres-service
+  type: ClusterIP
+  ports:
+      port: 5432
+      targetPort: 5432
