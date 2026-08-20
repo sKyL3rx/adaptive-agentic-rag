@@ -1,0 +1,33 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+  external_labels:
+    environment: local-dev
+    source: laptop
+
+scrape_configs:
+  - job_name: rag-orchestrator-local
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:8001
+        labels:
+          component: rag-orchestrator
+
+  - job_name: mcp-retrieval-local
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:9102
+        labels:
+          component: mcp-retrieval
+
+remote_write:
+  - url: http://host.docker.internal:19090/api/v1/write
+
+    write_relabel_configs:
+      - source_labels:
+          - __name__
+        regex: "rag_.*"
+        action: keep
