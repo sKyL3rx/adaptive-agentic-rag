@@ -1,0 +1,46 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Terraform secrets / local state
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+.terraform/
+.terraform.lock.hcl.backup
+crash.log
+
+# Credentials
+*.pem
+*.key
+
+# Local databases
+*.db
+mlflow.db
+
+# Logs / temp
+*.log
+tmp/
+temp/
+
+# Model/cache files
+.cache/
+huggingface/
+*.onnx
+*.bin
+*.safetensors
+
+# Evaluation runtime artifacts
+evaluation/results/**/*.tmp
