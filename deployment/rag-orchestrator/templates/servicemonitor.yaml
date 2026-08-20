@@ -1,0 +1,24 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.deployment.name }}-sm
+  namespace: {{ .Values.monitoring.namespace | default .Release.Namespace | quote }}
+  labels:
+    release: {{ .Values.monitoring.releaseName | quote }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.labels.appName | quote }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace | quote }}
+  endpoints:
+    - port: {{ .Values.monitoring.metricsPortName | default "http" | quote }}
+      path: {{ .Values.monitoring.path | default "/metrics" | quote }}
+      interval: {{ .Values.monitoring.interval | default "15s" | quote }}
+      scrapeTimeout: {{ .Values.monitoring.scrapeTimeout | default "10s" | quote }}
+{{- end }}
+
+
+#https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/developer/getting-started.md?utm_source=chatgpt.com

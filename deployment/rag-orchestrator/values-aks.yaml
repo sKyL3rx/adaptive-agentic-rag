@@ -1,0 +1,258 @@
+namespace: rag-orchestrator
+
+deployment:
+  name: rag-orchestrator
+  replicas: 1
+
+labels:
+  appName: rag-orchestrator
+
+container:
+  name: rag-orchestrator
+  port: 8001
+
+image:
+  name: baoduy3/rag-orchestrator-core
+  version: v-final-2
+  imagePullPolicy: IfNotPresent
+
+resources:
+  requests:
+    memory: 1Gi
+    cpu: 200m
+
+  limits:
+    memory: 2Gi
+    cpu: "2"
+
+secretEnv:
+  enabled: true
+  name: rag-model-secrets
+
+env:
+
+  # ========================================================
+  # MODEL PROVIDERS
+  # ========================================================
+
+  MODEL_PROVIDER: "runpod"
+
+  OPENAI_BASE_URL: "https://api.openai.com/v1"
+
+  # --------------------------------------------------------
+  # Compiler
+  # --------------------------------------------------------
+
+  COMPILER_MODEL_PROVIDER: "openai"
+  COMPILER_MODEL: "gpt-5.4-mini"
+  COMPILER_MODEL_ID: ""
+
+  COMPILER_OPENAI_TEMPERATURE: "0"
+  COMPILER_OPENAI_TOP_P: "1"
+  COMPILER_OPENAI_MAX_TOKENS: "256"
+  COMPILER_OPENAI_PRESENCE_PENALTY: "0"
+  COMPILER_OPENAI_FREQUENCY_PENALTY: "0"
+
+  # --------------------------------------------------------
+  # Context Resolver
+  # --------------------------------------------------------
+
+  CONTEXT_MODEL_PROVIDER: "runpod"
+  CONTEXT_MODEL: "Qwen/Qwen3-30B-A3B-Instruct-2507-FP8"
+  CONTEXT_MODEL_ID: "<YOUR_CONTEXT_PLANNER_RUNPOD_ID>"
+
+  CONTEXT_OPENAI_TEMPERATURE: "0"
+  CONTEXT_OPENAI_TOP_P: "1"
+  CONTEXT_OPENAI_MAX_TOKENS: "256"
+  CONTEXT_OPENAI_PRESENCE_PENALTY: "0"
+  CONTEXT_OPENAI_FREQUENCY_PENALTY: "0"
+
+  # --------------------------------------------------------
+  # Planner
+  # --------------------------------------------------------
+
+  PLANNER_MODEL_PROVIDER: "runpod"
+  PLANNER_MODEL: "Qwen/Qwen3-30B-A3B-Instruct-2507-FP8"
+  PLANNER_MODEL_ID: "<YOUR_CONTEXT_PLANNER_RUNPOD_ID>"
+
+  PLANNER_OPENAI_TEMPERATURE: "0"
+  PLANNER_OPENAI_TOP_P: "1"
+  PLANNER_OPENAI_MAX_TOKENS: "512"
+  PLANNER_OPENAI_PRESENCE_PENALTY: "0"
+  PLANNER_OPENAI_FREQUENCY_PENALTY: "0"
+
+  # --------------------------------------------------------
+  # Answer
+  # --------------------------------------------------------
+
+  ANSWER_MODEL_PROVIDER: "runpod"
+  ANSWER_MODEL: "Qwen/Qwen3.6-27B-FP8"
+  ANSWER_MODEL_ID: "<YOUR_ANSWER_REVIEWER_RUNPOD_ID>"
+
+  ANSWER_OPENAI_TEMPERATURE: "0"
+  ANSWER_OPENAI_TOP_P: "1"
+  ANSWER_OPENAI_MAX_TOKENS: "1024"
+  ANSWER_OPENAI_PRESENCE_PENALTY: "0"
+  ANSWER_OPENAI_FREQUENCY_PENALTY: "0"
+
+  # --------------------------------------------------------
+  # Reviewer
+  # --------------------------------------------------------
+
+  REVIEWER_MODEL_PROVIDER: "runpod"
+  REVIEWER_MODEL: "Qwen/Qwen3.6-27B-FP8"
+  REVIEWER_MODEL_ID: "<YOUR_ANSWER_REVIEWER_RUNPOD_ID>"
+
+  REVIEWER_OPENAI_TEMPERATURE: "0"
+  REVIEWER_OPENAI_TOP_P: "1"
+  REVIEWER_OPENAI_MAX_TOKENS: "512"
+  REVIEWER_OPENAI_PRESENCE_PENALTY: "0"
+  REVIEWER_OPENAI_FREQUENCY_PENALTY: "0"
+
+  # ========================================================
+  # WORKFLOW
+  # ========================================================
+
+  WORKFLOW_DEADLINE_MS: "3000000"
+  WORKFLOW_MAX_ITERATIONS: "18"
+
+  MAX_MODEL_CALLS: "7"
+  MAX_RETRIEVAL_ROUNDS: "2"
+  MAX_SUB_QUESTIONS: "4"
+
+  COMPILE_TIMEOUT_SECONDS: "420"
+  CONTEXT_TIMEOUT_SECONDS: "420"
+  PLAN_TIMEOUT_SECONDS: "420"
+  RETRIEVAL_TIMEOUT_SECONDS: "420"
+  ANSWER_TIMEOUT_SECONDS: "420"
+  VERIFY_TIMEOUT_SECONDS: "420"
+
+  COMPILE_HISTORY_MAX_TURNS: "4"
+  COMPILE_HISTORY_MAX_CHARS: "1600"
+
+  CONTEXT_HISTORY_MAX_TURNS: "4"
+  CONTEXT_HISTORY_MAX_CHARS: "1600"
+
+  # ========================================================
+  # RETRIEVAL
+  # ========================================================
+
+  SINGLE_TOP_K: "5"
+  BROAD_TOP_K: "8"
+  COMPLEX_TOP_K: "4"
+  RECOVERY_TOP_K: "4"
+
+  RETRIEVAL_CANDIDATE_MULTIPLIER: "3"
+  BROAD_MIN_EVIDENCE_ITEMS: "2"
+
+  ANSWER_EVIDENCE_CHARS_PER_ITEM: "1200"
+  REVIEW_EVIDENCE_CHARS_PER_ITEM: "1200"
+
+  MCP_URL: >-
+    http://mcp-server-service.mcp-server.svc.cluster.local:8002/mcp
+
+  MCP_TOOL_NAME: "batch_semantic_search"
+
+  RETRIEVAL_CORPUS_VERSION: >-
+    dmv_ca_2025_v4_chunk450_overlap80
+
+  MCP_REQUEST_TIMEOUT_SECONDS: "20"
+  MCP_SSE_READ_TIMEOUT_SECONDS: "300"
+
+  ENABLE_MCP_DEBUG_LOGS: "false"
+
+  # ========================================================
+  # SESSION / REDIS
+  # ========================================================
+
+  REDIS_URL: >-
+    redis://redis-master.default.svc.cluster.local:6379/0
+
+  MAX_CONCURRENT_REQUESTS: "4"
+
+  SESSION_LOCK_CACHE_MAXSIZE: "1000"
+  SESSION_LOCK_CACHE_TTL_SECONDS: "600"
+
+  ENABLE_EVAL_TELEMETRY: "false"
+
+  # ========================================================
+  # NVIDIA NEMO GUARDRAILS
+  # ========================================================
+
+  ENABLE_INPUT_GUARDRAILS: "true"
+
+  NEMO_URL: "http://<YOUR_NEMO_GUARDRAILS_SERVICE>.guardrails-ms.svc.cluster.local:<PORT>"
+
+  NEMO_GUARD_CONFIG_IN: "<YOUR_INPUT_GUARD_CONFIG>"
+  NEMO_GUARD_CONFIG_OUT: ""
+  NEMO_GUARD_CONFIG_INLINE: ""
+
+  # ========================================================
+  # OPENTELEMETRY
+  # ========================================================
+
+  OTEL_ENABLED: "true"
+  OTEL_SDK_DISABLED: "false"
+
+  ENABLE_INSTRUMENTATION: "true"
+  ENABLE_SENSITIVE_DATA: "false"
+
+  OTEL_SERVICE_NAME: "rag-orchestrator"
+  OTEL_SERVICE_VERSION: "2.0.0"
+  OTEL_DEPLOYMENT_ENVIRONMENT: "aks"
+
+  OTEL_EXPORTER_OTLP_ENDPOINT: >-
+    http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
+
+  OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+  OTEL_EXPORTER_OTLP_INSECURE: "true"
+
+
+# ========================================================
+# SERVICE
+# ========================================================
+
+service:
+  name: rag-orchestrator-service
+  type: ClusterIP
+
+
+Map_ports:
+  port: 8001
+  targetPort: 8001
+  name: http
+
+
+# ========================================================
+# PROMETHEUS MONITORING
+# ========================================================
+
+monitoring:
+  enabled: true
+  namespace: observability
+  releaseName: kps
+  metricsPortName: http
+  path: /metrics
+  interval: 15s
+  scrapeTimeout: 10s
+
+
+# ========================================================
+# NGINX INGRESS
+# ========================================================
+
+ingress:
+  enabled: true
+
+  className: nginx
+
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+
+  hosts:
+    - host: rag.project
+      paths:
+        - path: /
+          pathType: Prefix
