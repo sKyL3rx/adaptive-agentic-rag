@@ -1,0 +1,66 @@
+namespace: mcp-server
+
+deployment:
+  name: mcp-server
+  replicas: 1
+
+  labels:
+    appName: mcp-server
+
+  container:
+    name: mcp-server
+    port: 8002
+
+    image:
+      name: baoduy3/mcp_server_rag
+      version: v11
+      imagePullPolicy: IfNotPresent
+
+    environment:
+      # ---------- Runtime ----------
+      LOG_LEVEL: "INFO"
+
+      # ---------- Dense + sparse retrieval ----------
+      EMBEDDING_MODEL: "Qwen/Qwen3-Embedding-0.6B"
+
+      QDRANT_HOST: "qdrant.qdrant-vdb.svc.cluster.local"
+      QDRANT_PORT: "6333"
+      QDRANT_COLLECTION: "dmv_handbook_v4"
+
+      BASE_CANDIDATES: "30"
+
+      # ---------- Semantic retrieval cache ----------
+      CORPUS_VERSION: "dmv_ca_2025_v3"
+      QUERY_CENTROID_COLLECTION: "query_centroids_v1"
+      CENTROID_SIM_THRESHOLD: "0.93"
+      RETR_CACHE_TTL_SEC: "21600"
+      ENABLE_SEMANTIC_CACHE: "true"
+
+      # ---------- ONNX cross-encoder reranker ----------
+      RERANK_MODEL: "cross-encoder/ms-marco-MiniLM-L6-v2"
+      RERANK_MODEL_PATH: "/app/models/ms-marco-MiniLM-L6-v2"
+      RERANK_ONNX_FILE: "onnx/model_qint8_avx2.onnx"
+      RERANK_BATCH_SIZE: "16"
+      RERANK_MAX_LENGTH: "512"
+
+      # ---------- Redis ----------
+      REDIS_HOST: "redis-master.default.svc.cluster.local"
+      REDIS_PORT: "6379"
+      REDIS_DB: "0"
+      REDIS_PASSWORD: ""
+
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: "1"
+      limits:
+        memory: 8Gi
+        cpu: "4"
+
+service:
+  name: mcp-server-service
+  type: ClusterIP
+
+  Map_ports:
+    port: 8002
+    targetPort: 8002

@@ -1,0 +1,5 @@
+apiVersion: v2
+version: 0.1.0
+appVersion: "1.0"
+name: mcp-server-rag-k8s
+description: Deploying mcp server for RAG to k8s

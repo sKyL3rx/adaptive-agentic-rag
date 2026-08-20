@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace }}
+
+  labels:
+    app: {{ .Values.deployment.labels.appName }}
+
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+
+  selector:
+    matchLabels:
+      app: {{ .Values.deployment.labels.appName }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.deployment.labels.appName }}
+
+    spec:
+      terminationGracePeriodSeconds: 60
+
+      containers:
+        - name: {{ .Values.deployment.container.name }}
+
+          image: >-
+            {{ .Values.deployment.container.image.name }}:
+            {{- .Values.deployment.container.image.version }}
+
+          imagePullPolicy: >-
+            {{ .Values.deployment.container.image.imagePullPolicy }}
+
+          env:
+            {{- range $key, $value := .Values.deployment.container.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+
+          ports:
+            - name: mcp
+              containerPort: 8002
+              protocol: TCP
+
+            - name: metrics
+              containerPort: 9102
+              protocol: TCP
+
+          # warmup() loads ONNX models BEFORE
+          # FastMCP starts listening on 8002.
+          startupProbe:
+            tcpSocket:
+              port: mcp
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 60
+
+          readinessProbe:
+            tcpSocket:
+              port: mcp
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            tcpSocket:
+              port: mcp
+            periodSeconds: 15
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: {{ .Values.deployment.container.resources.requests.cpu }}
+              memory: {{ .Values.deployment.container.resources.requests.memory }}
+
+            limits:
+              cpu: {{ .Values.deployment.container.resources.limits.cpu }}
+              memory: {{ .Values.deployment.container.resources.limits.memory }}
