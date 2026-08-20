@@ -1,0 +1,4 @@
+subscription_id = "<YOUR_AZURE_SUBSCRIPTION_ID>"
+tenant_id       = "<YOUR_AZURE_TENANT_ID>"
+region          = "<YOUR_AZURE_REGION>"
+project_id      = "<YOUR_PROJECT_ID>"
