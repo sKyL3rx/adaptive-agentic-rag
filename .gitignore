@@ -44,3 +44,6 @@ huggingface/
 
 # Evaluation runtime artifacts
 evaluation/results/**/*.tmp
+
+# Source documents kept locally
+data/pdf/
