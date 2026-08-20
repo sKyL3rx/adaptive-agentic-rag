@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+.git/
+.gitignore
+
+.env
+.env.*
+
+tests/
+test.py
+export_onnx.py
+
+models/**/onnx/model.onnx
