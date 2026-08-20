@@ -1,0 +1,32 @@
+# Python 3.11.15
+# RAG orchestrator after migrating from AutoGen to Microsoft Agent Framework.
+
+agent-framework-core==1.12.1
+agent-framework-openai==1.11.0
+openai==2.46.0
+
+mcp==1.28.1
+
+# API / WebSocket server.
+fastapi==0.121.3
+uvicorn[standard]==0.38.0
+python-multipart==0.0.20
+
+# HTTP clients.
+httpx==0.28.1
+requests==2.32.5
+
+# Configuration and typed contracts.
+pydantic==2.12.4
+pydantic-settings==2.11.0
+python-dotenv==1.2.1
+
+# Runtime state and caching.
+cachetools==6.2.4
+redis==7.1.0
+
+# Metrics and tracing.
+prometheus-client==0.23.1
+opentelemetry-api==1.39.1
+opentelemetry-sdk==1.39.1
+opentelemetry-exporter-otlp-proto-grpc==1.39.1
